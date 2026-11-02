@@ -3,110 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Save Our Date - Alex & Jordan</title>
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Save Our Date!</title>
     <style>
         body {
-            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fdfaf6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
-        .serif-font {
-            font-family: 'Cormorant Garamond', serif;
+        .card-container {
+            position: relative;
+            width: 360px;
+            height: 520px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .reveal-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: #ffffff;
+        }
+        h1 { color: #d4af37; font-size: 2rem; margin-bottom: 5px; }
+        p { color: #555; font-size: 1.1rem; line-height: 1.5; }
+        .date { font-size: 1.8rem; font-weight: bold; color: #222; margin: 20px 0; }
+        .cal-btn {
+            padding: 10px 20px;
+            background: #d4af37;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .cal-btn:hover { transform: scale(1.05); }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+            z-index: 2;
         }
     </style>
 </head>
-<body class="bg-stone-50 text-stone-800 antialiased min-h-screen flex flex-col justify-between selection:bg-stone-200">
+<body>
 
-    <!-- Hero / Main Section -->
-    <main class="flex-grow flex items-center justify-center px-4 py-16">
-        <div class="max-w-xl w-full bg-white shadow-sm border border-stone-200/60 p-8 sm:p-12 text-center rounded-sm">
-            
-            <!-- Subtitle -->
-            <p class="text-xs uppercase tracking-[0.3em] text-stone-500 mb-6">Save the Date</p>
-            
-            <!-- Names -->
-            <h1 class="serif-font text-5xl sm:text-6xl font-normal text-stone-900 mb-4 italic">
-                Alex <span class="not-italic text-stone-400 text-3xl">&amp;</span> Jordan
-            </h1>
-            
-            <!-- Divider Line -->
-            <div class="w-12 h-[1px] bg-stone-300 mx-auto my-6"></div>
-            
-            <!-- Date & Location -->
-            <div class="space-y-2 mb-8">
-                <p class="serif-font text-2xl text-stone-700 tracking-wide">October 14, 2027</p>
-                <p class="text-sm text-stone-500 uppercase tracking-widest">Napa Valley, California</p>
-            </div>
+<div class="card-container">
+    <!-- Underneath Layer (The Actual Details) -->
+    <div class="reveal-layer">
+        <p>WE ARE GETTING MARRIED</p>
+        <h1>Alex & Jordan</h1>
+        <p class="date">OCTOBER 10, 2026</p>
+        <p>San Francisco, CA</p>
+        <a class="cal-btn" href="https://calendar.google.com" target="_blank">Add to Calendar</a>
+    </div>
 
-            <!-- Countdown Timer -->
-            <div id="countdown" class="grid grid-cols-4 gap-4 max-w-xs mx-auto mb-10 border-y border-stone-100 py-4">
-                <div>
-                    <span id="days" class="serif-font text-2xl font-semibold text-stone-800 block">00</span>
-                    <span class="text-[10px] uppercase tracking-wider text-stone-400">Days</span>
-                </div>
-                <div>
-                    <span id="hours" class="serif-font text-2xl font-semibold text-stone-800 block">00</span>
-                    <span class="text-[10px] uppercase tracking-wider text-stone-400">Hours</span>
-                </div>
-                <div>
-                    <span id="minutes" class="serif-font text-2xl font-semibold text-stone-800 block">00</span>
-                    <span class="text-[10px] uppercase tracking-wider text-stone-400">Minutes</span>
-                </div>
-                <div>
-                    <span id="seconds" class="serif-font text-2xl font-semibold text-stone-800 block">00</span>
-                    <span class="text-[10px] uppercase tracking-wider text-stone-400">Seconds</span>
-                </div>
-            </div>
+    <!-- Scratch Layer Over the Top -->
+    <canvas id="scratchCanvas" width="360" height="520"></canvas>
+</div>
 
-            <!-- Call to Action / Message -->
-            <p class="text-xs text-stone-500 italic mb-8">
-                Formal invitation and website with lodging details to follow.
-            </p>
+<script>
+    const canvas = document.getElementById('scratchCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
 
-            <!-- Calendar Add Button (Optional placeholder) -->
-            <a href="data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ASUMMARY:Alex%20and%20Jordan's%20Wedding%0ADESCRIPTION:Save%20the%20Date!%0ALOCATION:Napa%20Valley%2C%20California%0ADTSTART:20271014T150000Z%0AEND:20271014T220000Z%0AEND:VEVENT%0AEND:VCALENDAR" 
-               download="wedding-save-the-date.ics"
-               class="inline-block text-xs uppercase tracking-widest border border-stone-800 text-stone-800 px-6 py-3 hover:bg-stone-800 hover:text-white transition-colors duration-300">
-               Add to Calendar
-            </a>
+    // Fill the canvas with a solid "scratch-off" layer cover
+    ctx.fillStyle = '#bc985a'; 
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        </div>
-    </main>
+    // Add overlay text instructions
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Scratch here to reveal', 180, 240);
+    ctx.fillText('our secret!', 180, 270);
 
-    <!-- Footer -->
-    <footer class="py-6 text-center text-xs text-stone-400 tracking-wider uppercase">
-        A &amp; J
-    </footer>
+    function scratch(e) {
+        if (!isDrawing) return;
+        
+        // Handle both desktop mouse and mobile touch inputs
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches.clientX) - rect.left;
+        const y = (e.clientY || e.touches.clientY) - rect.top;
 
-    <!-- Countdown Script -->
-    <script>
-        // Set your wedding date here (Year, Month Index 0-11, Day, Hour, Minute)
-        const weddingDate = new Date(2027, 9, 14, 15, 0, 0).getTime();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 25, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = weddingDate - now;
+    // Event Listeners for Interaction
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mousemove', scratch);
 
-            if (distance < 0) {
-                document.getElementById("countdown").innerHTML = "<p class='col-span-4 text-xs tracking-widest text-stone-600 uppercase'>The Big Day is Here!</p>";
-                return;
-            }
+    canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+    canvas.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); scratch(e); });
+</script>
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById("days").innerText = String(days).padStart(2, '0');
-            document.getElementById("hours").innerText = String(hours).padStart(2, '0');
-            document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
-            document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
-        }
-
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-    </script>
 </body>
 </html>
